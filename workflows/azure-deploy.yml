@@ -8,6 +8,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: mypay-staff-chatbot    # Replace with your app name
   NODE_VERSION: '18.x'
+  VITE_API_URL: https://mypay-staff-chatbot-a2ape5hwcmfxgvfg.eastus2-01.azurewebsites.net/api 
 
 jobs:
   build-and-deploy:
@@ -40,12 +41,15 @@ jobs:
       run: |
         # Create a deployment package with only necessary files
         mkdir deploy-package
-        cp -r backend/* deploy-package/
-        cp package*.json deploy-package/
+        # Copy backend's server.js, src, package.json, and package-lock.json to the root of deploy-package
+        cp backend/server.js deploy-package/
+        cp -r backend/src deploy-package/
+        cp backend/package.json deploy-package/package.json
+        cp backend/package-lock.json deploy-package/package-lock.json
         # Copy built frontend
-        mkdir -p deploy-package/public
-        cp -r dist/* deploy-package/public/
-
+        # Copy the built frontend (which is now in backend/public) into deploy-package/public
+        cp -r backend/public deploy-package/public
+        
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
