@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: digirestro-chatbot    # Replace with your app name
+  AZURE_WEBAPP_NAME: mypay-staff-chatbot    # Replace with your app name
   NODE_VERSION: '18.x'
 
 jobs:
