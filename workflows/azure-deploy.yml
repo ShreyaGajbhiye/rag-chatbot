@@ -31,6 +31,7 @@ jobs:
     - name: Build application  
       run: |
         npm run build
+        rm -rf backend/public # Clean out old public dir
         # Copy built frontend to backend's public directory for serving
         mkdir -p backend/public
         cp -r dist/* backend/public/
