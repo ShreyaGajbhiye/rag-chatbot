@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TTS Debug Test</title>
+</head>
+<body>
+    <h1>TTS Debug Test</h1>
+    <button onclick="testTTS()">Test TTS (with credentials)</button>
+    <button onclick="testTTSNoCredentials()">Test TTS (no credentials)</button>
+    <button onclick="testHealthCheck()">Test Health Check</button>
+    <button onclick="testPostEndpoint()">Test Simple POST</button>
+    <div id="results"></div>
+
+    <script>
+        async function testTTS() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing TTS...</p>';
+            
+            try {
+                console.log('🔊 Testing TTS endpoint...');
+                console.log('🔊 URL:', 'http://localhost:3001/api/speech/text-to-speech');
+                console.log('🔊 Body:', JSON.stringify({ text: 'Hello world test' }));
+                
+                const response = await fetch('http://localhost:3001/api/speech/text-to-speech', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    credentials: 'include',
+                    body: JSON.stringify({ text: 'Hello world test' })
+                });
+                
+                console.log('🔊 Response status:', response.status);
+                console.log('🔊 Response statusText:', response.statusText);
+                console.log('🔊 Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    console.log('🔊 Audio blob size:', audioBlob.size);
+                    console.log('🔊 Audio blob type:', audioBlob.type);
+                    results.innerHTML = `<p>✅ TTS Success! Audio size: ${audioBlob.size} bytes, type: ${audioBlob.type}</p>`;
+                    
+                    // Try to play the audio
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.play().then(() => {
+                        console.log('🔊 Audio playback started');
+                    }).catch(err => {
+                        console.error('🔊 Audio playback failed:', err);
+                    });
+                } else {
+                    const errorText = await response.text();
+                    console.error('🔊 Response error:', errorText);
+                    results.innerHTML = `<p>❌ TTS Failed: ${response.status} - ${errorText}</p>`;
+                }
+            } catch (error) {
+                console.error('🔊 TTS Error:', error);
+                console.error('🔊 Error name:', error.name);
+                console.error('🔊 Error message:', error.message);
+                console.error('🔊 Error stack:', error.stack);
+                results.innerHTML = `<p>❌ TTS Error: ${error.name} - ${error.message}</p>`;
+            }
+        }
+
+        async function testHealthCheck() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing Health Check...</p>';
+            
+            try {
+                console.log('🔊 Testing health check endpoint...');
+                const response = await fetch('http://localhost:3001/api/speech/test', {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'include'
+                });
+                
+                console.log('🔊 Health check response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🔊 Health check data:', data);
+                    results.innerHTML = `<p>✅ Health Check Success: ${JSON.stringify(data)}</p>`;
+                } else {
+                    const errorText = await response.text();
+                    results.innerHTML = `<p>❌ Health Check Failed: ${response.status} - ${errorText}</p>`;
+                }
+            } catch (error) {
+                console.error('🔊 Health Check Error:', error);
+                results.innerHTML = `<p>❌ Health Check Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testTTSNoCredentials() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing TTS without credentials...</p>';
+            
+            try {
+                console.log('🔊 Testing TTS endpoint without credentials...');
+                console.log('🔊 URL:', 'http://localhost:3001/api/speech/text-to-speech');
+                console.log('🔊 Body:', JSON.stringify({ text: 'Hello world test no creds' }));
+                
+                const response = await fetch('http://localhost:3001/api/speech/text-to-speech', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({ text: 'Hello world test no creds' })
+                });
+                
+                console.log('🔊 Response status:', response.status);
+                console.log('🔊 Response statusText:', response.statusText);
+                console.log('🔊 Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    console.log('🔊 Audio blob size:', audioBlob.size);
+                    console.log('🔊 Audio blob type:', audioBlob.type);
+                    results.innerHTML = `<p>✅ TTS No Creds Success! Audio size: ${audioBlob.size} bytes, type: ${audioBlob.type}</p>`;
+                    
+                    // Try to play the audio
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.play().then(() => {
+                        console.log('🔊 Audio playback started');
+                    }).catch(err => {
+                        console.error('🔊 Audio playback failed:', err);
+                    });
+                } else {
+                    const errorText = await response.text();
+                    console.error('🔊 Response error:', errorText);
+                    results.innerHTML = `<p>❌ TTS No Creds Failed: ${response.status} - ${errorText}</p>`;
+                }
+            } catch (error) {
+                console.error('🔊 TTS No Creds Error:', error);
+                console.error('🔊 Error name:', error.name);
+                console.error('🔊 Error message:', error.message);
+                console.error('🔊 Error stack:', error.stack);
+                results.innerHTML = `<p>❌ TTS No Creds Error: ${error.name} - ${error.message}</p>`;
+            }
+        }
+
+        async function testPostEndpoint() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing Simple POST...</p>';
+            
+            try {
+                console.log('🔊 Testing simple POST endpoint...');
+                const response = await fetch('http://localhost:3001/api/speech/test-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    credentials: 'include',
+                    body: JSON.stringify({ test: 'simple test data' })
+                });
+                
+                console.log('🔊 Simple POST response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🔊 Simple POST data:', data);
+                    results.innerHTML = `<p>✅ Simple POST Success: ${JSON.stringify(data)}</p>`;
+                } else {
+                    const errorText = await response.text();
+                    results.innerHTML = `<p>❌ Simple POST Failed: ${response.status} - ${errorText}</p>`;
+                }
+            } catch (error) {
+                console.error('🔊 Simple POST Error:', error);
+                results.innerHTML = `<p>❌ Simple POST Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

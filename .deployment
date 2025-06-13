@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "defaultProvider": "azure",
+  "providers": {
+    "azure": {
+      "app": {
+        "settings": {
+          "SCM_DO_BUILD_DURING_DEPLOYMENT": "true",
+          "ENABLE_ORYX_BUILD": "true",
+          "PRE_BUILD_SCRIPT_PATH": "",
+          "POST_BUILD_SCRIPT_PATH": "startup.sh",
+          "WEBSITE_NODE_DEFAULT_VERSION": "18.x",
+          "WEBSITE_RESTART_TIME": "0"
+        }
+      }
+    }
+  }
+}

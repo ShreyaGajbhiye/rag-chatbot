@@ -1,0 +1,53 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: digirestro-chatbot    # Replace with your app name
+  NODE_VERSION: '18.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+
+    - name: Build application  
+      run: |
+        npm run build
+        # Copy built frontend to backend's public directory for serving
+        mkdir -p backend/public
+        cp -r dist/* backend/public/
+
+    - name: Create deployment package
+      run: |
+        # Create a deployment package with only necessary files
+        mkdir deploy-package
+        cp -r backend/* deploy-package/
+        cp package*.json deploy-package/
+        # Copy built frontend
+        mkdir -p deploy-package/public
+        cp -r dist/* deploy-package/public/
+
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: deploy-package
